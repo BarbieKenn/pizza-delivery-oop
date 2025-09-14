@@ -3,7 +3,7 @@ from enum import Enum
 
 class OrderStatus(Enum):
     """
-    Order status and available passing
+    Order status and available transitions
     NEW -> ACCEPTED -> BAKING -> BOXED -> DISPATCHED -> DELIVERED
     NEW -> CANCELED
     ACCEPTED -> CANCELED
