@@ -24,3 +24,11 @@ class InvalidTransition(DomainError):
     No cancellation after BAKING."""
 
     pass
+
+
+class AlreadyFinalized(DomainError):
+    """Invalid status transition.
+    No callouts from DELIVERED/CANCELED.
+    """
+
+    pass
