@@ -1,6 +1,9 @@
+from __future__ import annotations
+
 from typing import Iterable
 
 from menu import Menu
+from pricing import Money, OrderView, PricingStrategy
 from products import Pizza
 from status import OrderStatus
 
@@ -80,3 +83,33 @@ class Order:
         Raise AlreadyFinalized if DELIVERED or CANCELED.
         Raise InvalidTransition otherwise.
         """
+
+    _pricing_strategy: PricingStrategy
+    _status: "OrderStatus"
+
+    def set_pricing_strategy(self, strategy: PricingStrategy) -> None:
+        """
+        Acquire pricing strategy.
+
+        Available ONLY at NEW/ACCEPTED.
+        Otherwise, InvalidPricingOperation.
+        """
+
+        raise NotImplementedError
+
+    def subtotal(self) -> Money:
+        """
+        Sum of positions without sales, taxes and delivery.
+        """
+        raise NotImplementedError
+
+    def final_total(self) -> Money:
+        """Total sum taking into account pricing strategy."""
+
+        raise NotImplementedError
+
+    def as_view(self) -> "OrderView":
+        """
+        Return read-only order representation."""
+
+        raise NotImplementedError
