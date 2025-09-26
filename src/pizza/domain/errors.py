@@ -62,3 +62,46 @@ class IncompatibleStrategy(PricingError):
     """Incompatible Strategy."""
 
     pass
+
+
+class InsufficientIngredients(DomainError):
+    def __init__(self, needed, available):
+        self.needed = needed
+        self.available = available
+
+    def __str__(self) -> str:
+        return f"Insufficient ingredients: need {self.needed}, have {self.available}"
+
+
+class ReservationError(DomainError):
+    def __init__(self, reason: str):
+        self.reason = reason
+
+    def __str__(self) -> str:
+        return f"Reservation error: {self.reason}"
+
+
+class OvenCapacityExceeded(DomainError):
+    def __init__(self, requested: int, capacity: int):
+        self.requested = requested
+        self.capacity = capacity
+
+    def __str__(self) -> str:
+        return f"Oven capacity exceeded: requested {self.requested}, capacity {self.capacity}"
+
+
+class OvenUnavailable(DomainError):
+    def __init__(self, reason: str):
+        self.reason = reason
+
+    def __str__(self) -> str:
+        return f"Oven unavailable: {self.reason}"
+
+
+class InvalidOrderState(DomainError):
+    def __init__(self, state: str, action: str):
+        self.state = state
+        self.action = action
+
+    def __str__(self) -> str:
+        return f"Invalid order state: cannot {self.action} from {self.state}"

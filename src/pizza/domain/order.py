@@ -1,7 +1,9 @@
 from __future__ import annotations
 
-from typing import Iterable
+from decimal import Decimal
+from typing import Iterable, Mapping, Protocol, Sequence
 
+from inventory import Ingredient, Inventory, Oven
 from menu import Menu
 from pricing import Money, OrderView, PricingStrategy
 from products import Pizza
@@ -50,12 +52,6 @@ class Order:
 
     def accept(self) -> None:
         """Set status to ACCEPTED (only from NEW).
-        Raise AlreadyFinalized if DELIVERED or CANCELED.
-        Raise InvalidTransition otherwise.
-        """
-
-    def bake(self) -> None:
-        """Set status to BAKING (only from ACCEPTED).
         Raise AlreadyFinalized if DELIVERED or CANCELED.
         Raise InvalidTransition otherwise.
         """
@@ -112,4 +108,25 @@ class Order:
         """
         Return read-only order representation."""
 
+        raise NotImplementedError
+
+    def to_units(self) -> Sequence[OrderUnit]:
+        """
+        Give order units individually to oven.
+        """
+        raise NotImplementedError
+
+    def compute_total_requirements(self) -> Mapping["Ingredient", Decimal]:
+        raise NotImplementedError
+
+    def bake(self, inventory: "Inventory", oven: "Oven") -> None:
+        """Set status to BAKING (only from ACCEPTED).
+        Raise AlreadyFinalized if DELIVERED or CANCELED.
+        Raise InvalidTransition otherwise.
+        """
+        raise NotImplementedError
+
+
+class OrderUnit(Protocol):
+    def requirements(self) -> Mapping["Ingredient", Decimal]:
         raise NotImplementedError
