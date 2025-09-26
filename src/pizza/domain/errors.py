@@ -105,3 +105,16 @@ class InvalidOrderState(DomainError):
 
     def __str__(self) -> str:
         return f"Invalid order state: cannot {self.action} from {self.state}"
+
+
+class NoCouriersAvailable(DomainError):
+    def __str__(self) -> str:
+        return "No couriers available"
+
+
+class CourierUnavailable(DomainError):
+    def __init__(self, courier_id: str):
+        self.courier_id = courier_id
+
+    def __str__(self) -> str:
+        return f"Courier {self.courier_id} unavailable"

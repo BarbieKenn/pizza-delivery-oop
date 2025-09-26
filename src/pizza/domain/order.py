@@ -3,6 +3,7 @@ from __future__ import annotations
 from decimal import Decimal
 from typing import Iterable, Mapping, Protocol, Sequence
 
+from delivery import Coordinates, Dispatcher
 from inventory import Ingredient, Inventory, Oven
 from menu import Menu
 from pricing import Money, OrderView, PricingStrategy
@@ -62,11 +63,12 @@ class Order:
         Raise InvalidTransition otherwise.
         """
 
-    def dispatch(self) -> None:
+    def dispatch(self, dispatcher: "Dispatcher") -> None:
         """Set status to DISPATCHED (only from BOXED).
         Raise AlreadyFinalized if DELIVERED or CANCELED.
         Raise InvalidTransition otherwise.
         """
+        raise NotImplementedError
 
     def deliver(self) -> None:
         """Set status to DELIVERED (only from DISPATCHED).
@@ -125,6 +127,8 @@ class Order:
         Raise InvalidTransition otherwise.
         """
         raise NotImplementedError
+
+    delivery_coordinates: "Coordinates"
 
 
 class OrderUnit(Protocol):
