@@ -32,3 +32,33 @@ class AlreadyFinalized(DomainError):
     """
 
     pass
+
+
+class PricingError(Exception):
+    """Base pricing error"""
+
+    pass
+
+
+class InvalidPricingOperation(PricingError):
+    """Invalid pricing operation"""
+
+    pass
+
+
+class CouponExpired(PricingError):
+    """Expired coupon."""
+
+    pass
+
+
+class CouponNotFirstOrder(PricingError):
+    """Not first order."""
+
+    pass
+
+
+class IncompatibleStrategy(PricingError):
+    """Incompatible Strategy."""
+
+    pass
