@@ -118,3 +118,55 @@ class CourierUnavailable(DomainError):
 
     def __str__(self) -> str:
         return f"Courier {self.courier_id} unavailable"
+
+
+class OrderNotFound(DomainError):
+    def __init__(self, order_id: str):
+        self.order_id = order_id
+
+    def __str__(self) -> str:
+        return f"Order not found: {self.order_id}"
+
+
+class DuplicateOrderId(DomainError):
+    def __init__(self, order_id: str):
+        self.order_id = order_id
+
+    def __str__(self) -> str:
+        return f"Duplicate order id: {self.order_id}"
+
+
+class PaymentError(DomainError):
+    """Base payment error."""
+
+
+class PaymentAlreadyAuthorized(PaymentError):
+    def __str__(self) -> str:
+        return "Payment already authorized"
+
+
+class PaymentNotAuthorized(PaymentError):
+    def __str__(self) -> str:
+        return "Payment not authorized"
+
+
+class PaymentAlreadyCaptured(PaymentError):
+    def __str__(self) -> str:
+        return "Payment already captured"
+
+
+class PaymentAmountMismatch(PaymentError):
+    def __init__(self, amount: str, reason: str = ""):
+        self.amount = amount
+        self.reason = reason
+
+    def __str__(self) -> str:
+        return f"Invalid capture amount: {self.amount}. {self.reason}".strip()
+
+
+class RefundExceedsCapture(PaymentError):
+    def __init__(self, amount: str):
+        self.amount = amount
+
+    def __str__(self) -> str:
+        return f"Refund exceeds captured amount: {self.amount}"
