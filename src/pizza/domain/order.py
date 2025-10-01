@@ -12,7 +12,7 @@ from status import OrderStatus
 
 
 class OrderItem:
-    """ """
+    """Single order line: one pizza and its quantity."""
 
     def __init__(self, pizza: Pizza, qty: int):
         self.pizza = pizza
@@ -20,18 +20,32 @@ class OrderItem:
 
 
 class Order:
-    """ """
+    """Order entity: items, pricing, state transitions, and delivery."""
 
     status: OrderStatus
 
     def __init__(self, menu: Menu):
         self.menu = menu
 
-    def add_item(self, pizza: Pizza, qty: int = 1) -> None: ...
-    def remove_item(self, pizza: Pizza) -> None: ...
-    def clear(self) -> None: ...
-    def items(self) -> Iterable[OrderItem]: ...
-    def total(self) -> float: ...
+    def add_item(self, pizza: Pizza, qty: int = 1) -> None:
+        """Add pizza with quantity to order."""
+        ...
+
+    def remove_item(self, pizza: Pizza) -> None:
+        """Remove pizza from order completely."""
+        ...
+
+    def clear(self) -> None:
+        """Remove all items from order."""
+        ...
+
+    def items(self) -> Iterable[OrderItem]:
+        """Return iterable of order items."""
+        ...
+
+    def total(self) -> float:
+        """Return raw float total (temporary, not for final sums)."""
+        ...
 
     def can_accept(self) -> bool:
         """Return True if order can move NEW -> ACCEPTED."""
@@ -132,5 +146,7 @@ class Order:
 
 
 class OrderUnit(Protocol):
+    """One baked unit: pizza + size + toppings."""
+
     def requirements(self) -> Mapping["Ingredient", Decimal]:
         raise NotImplementedError
