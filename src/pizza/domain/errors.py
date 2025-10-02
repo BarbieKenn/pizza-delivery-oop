@@ -65,6 +65,8 @@ class IncompatibleStrategy(PricingError):
 
 
 class InsufficientIngredients(DomainError):
+    """Not enough stock for reservation."""
+
     def __init__(self, needed, available):
         self.needed = needed
         self.available = available
@@ -74,6 +76,8 @@ class InsufficientIngredients(DomainError):
 
 
 class ReservationError(DomainError):
+    """Invalid reservation state (commit/release issue)."""
+
     def __init__(self, reason: str):
         self.reason = reason
 
@@ -82,6 +86,8 @@ class ReservationError(DomainError):
 
 
 class OvenCapacityExceeded(DomainError):
+    """Batch size exceeds oven capacity."""
+
     def __init__(self, requested: int, capacity: int):
         self.requested = requested
         self.capacity = capacity
@@ -91,6 +97,8 @@ class OvenCapacityExceeded(DomainError):
 
 
 class OvenUnavailable(DomainError):
+    """Oven is unavailable (capacity=0 or offline)."""
+
     def __init__(self, reason: str):
         self.reason = reason
 
@@ -99,6 +107,8 @@ class OvenUnavailable(DomainError):
 
 
 class InvalidOrderState(DomainError):
+    """Action not allowed in current order state."""
+
     def __init__(self, state: str, action: str):
         self.state = state
         self.action = action
@@ -108,11 +118,15 @@ class InvalidOrderState(DomainError):
 
 
 class NoCouriersAvailable(DomainError):
+    """No couriers are available for assignment."""
+
     def __str__(self) -> str:
         return "No couriers available"
 
 
 class CourierUnavailable(DomainError):
+    """Courier became unavailable during assignment."""
+
     def __init__(self, courier_id: str):
         self.courier_id = courier_id
 
@@ -121,6 +135,8 @@ class CourierUnavailable(DomainError):
 
 
 class OrderNotFound(DomainError):
+    """Order not found in repository."""
+
     def __init__(self, order_id: str):
         self.order_id = order_id
 
@@ -129,6 +145,8 @@ class OrderNotFound(DomainError):
 
 
 class DuplicateOrderId(DomainError):
+    """Duplicate order ID on save()."""
+
     def __init__(self, order_id: str):
         self.order_id = order_id
 
@@ -141,21 +159,29 @@ class PaymentError(DomainError):
 
 
 class PaymentAlreadyAuthorized(PaymentError):
+    """Repeated authorize not allowed."""
+
     def __str__(self) -> str:
         return "Payment already authorized"
 
 
 class PaymentNotAuthorized(PaymentError):
+    """Capture/refund attempted without prior authorize."""
+
     def __str__(self) -> str:
         return "Payment not authorized"
 
 
 class PaymentAlreadyCaptured(PaymentError):
+    """Repeated capture not allowed."""
+
     def __str__(self) -> str:
         return "Payment already captured"
 
 
 class PaymentAmountMismatch(PaymentError):
+    """Invalid capture amount (not within allowed bounds)."""
+
     def __init__(self, amount: str, reason: str = ""):
         self.amount = amount
         self.reason = reason
@@ -165,6 +191,8 @@ class PaymentAmountMismatch(PaymentError):
 
 
 class RefundExceedsCapture(PaymentError):
+    """Refund amount exceeds captured total."""
+
     def __init__(self, amount: str):
         self.amount = amount
 
