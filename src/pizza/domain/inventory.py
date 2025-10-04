@@ -2,9 +2,10 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from decimal import Decimal
-from typing import Mapping, Protocol, Sequence
+from typing import TYPE_CHECKING, Mapping, Protocol, Sequence
 
-from order import OrderUnit
+if TYPE_CHECKING:
+    from .order import OrderUnit
 
 
 @dataclass(frozen=True, slots=True)

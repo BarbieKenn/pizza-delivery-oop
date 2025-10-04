@@ -1,14 +1,16 @@
 from __future__ import annotations
 
 from decimal import Decimal
-from typing import Iterable, Mapping, Protocol, Sequence
+from typing import TYPE_CHECKING, Iterable, Mapping, Protocol, Sequence
 
-from delivery import Coordinates, Dispatcher
-from inventory import Ingredient, Inventory, Oven
-from menu import Menu
-from pricing import Money, OrderView, PricingStrategy
-from products import Pizza
-from status import OrderStatus
+from .delivery import Coordinates, Dispatcher
+from .menu import Menu
+from .pricing import Money, OrderView, PricingStrategy
+from .products import Pizza
+from .status import OrderStatus
+
+if TYPE_CHECKING:
+    from .inventory import Ingredient, Inventory, Oven
 
 
 class OrderItem:

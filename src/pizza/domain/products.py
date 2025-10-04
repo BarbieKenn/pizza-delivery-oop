@@ -1,10 +1,12 @@
 from decimal import Decimal
 from enum import Enum
+from typing import TYPE_CHECKING
 
-from errors import InvalidProductData
-from inventory import IngredientRequirement
-
+from .errors import InvalidProductData
 from .types import Money, quantize_money
+
+if TYPE_CHECKING:
+    from .inventory import IngredientRequirement
 
 
 class PizzaSize(Enum):
@@ -35,7 +37,7 @@ class Topping:
         name: str,
         price: Money,
         sku: str,
-        requirements: list[IngredientRequirement] | None = None,
+        requirements: list["IngredientRequirement"] | None = None,
     ):
         self.name = name
         self.price = price
@@ -44,7 +46,7 @@ class Topping:
 
         if self.price < 0:
             raise InvalidProductData(f"Topping {sku} must be >= 0.")
-        if not all(req.amount > 0 for req in requirements):
+        if not all(req.amount > 0 for req in self.requirements):
             raise InvalidProductData(f"Topping {sku}: all requirements must be > 0")
 
 
@@ -65,7 +67,7 @@ class Pizza:
         name: str,
         default_price: Money,
         sku: str,
-        recipe: list[IngredientRequirement],
+        recipe: list["IngredientRequirement"],
     ):
         self.name = name
         self.default_price = default_price
@@ -83,9 +85,9 @@ class Pizza:
         multiplier = MULTIPLIERS[size]
         return quantize_money(self.default_price * multiplier)
 
-    def requirements(self, size: PizzaSize) -> list[IngredientRequirement]:
+    def requirements(self, size: PizzaSize) -> list["IngredientRequirement"]:
         multiplier = MULTIPLIERS[size]
-        result: list[IngredientRequirement] = []
+        result: list["IngredientRequirement"] = []
         for req in self.recipe:
             result.append(
                 IngredientRequirement(ingredient=req.ingredient, amount=req.amount * multiplier)
