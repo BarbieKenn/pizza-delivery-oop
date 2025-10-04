@@ -1,21 +1,68 @@
-from abc import ABC, abstractmethod
+from typing import Sequence
 
-from products import Pizza, Topping
+from .errors import DuplicateSku
+from .products import Pizza, Topping
 
 
-class Menu(ABC):
+class Menu:
     """
     Catalog: read-only access to Pizza, Topping and search.
     """
 
-    @abstractmethod
-    def pizzas(self) -> list[Pizza]: ...
+    def __init__(self, pizzas: Sequence[Pizza], toppings: Sequence[Topping]) -> None:
+        seen_pizzas = set()
+        for pizza in pizzas:
+            sku = pizza.sku.strip().lower
+            if sku in seen_pizzas:
+                raise DuplicateSku(f"Similar pizza sku - {sku}")
+            else:
+                seen_pizzas.add(sku)
 
-    @abstractmethod
-    def toppings(self) -> list[Topping]: ...
+        seen_toppings = set()
+        for topping in toppings:
+            sku = topping.sku.strip().lower()
+            if sku in seen_toppings:
+                raise DuplicateSku(f"Similar topping sku - {sku}")
+            else:
+                seen_toppings.add(sku)
 
-    @abstractmethod
-    def find_pizza(self, name: str) -> Pizza | None: ...
+        self._pizzas = tuple(pizzas)
+        self._toppings = tuple(toppings)
 
-    @abstractmethod
-    def find_topping(self, name: str) -> Topping | None: ...
+    def list_pizzas(self) -> Sequence[Pizza]:
+        return self._pizzas
+
+    def list_toppings(self) -> Sequence[Topping]:
+        return self._toppings
+
+    def find_pizza(self, name: str) -> Sequence[Pizza]:
+        if not name:
+            return ()
+
+        dummy = str(name).strip()
+        if not dummy:
+            return ()
+
+        _match = []
+        nor_name = (str(name).strip()).casefold()
+        for pizza in self._pizzas:
+            nor_pizza = pizza.name.casefold()
+            if nor_name in nor_pizza:
+                _match.append(pizza)
+        return tuple(_match)
+
+    def find_topping(self, name: str) -> Sequence[Topping]:
+        if not name:
+            return ()
+
+        dummy = str(name).strip()
+        if not dummy:
+            return ()
+
+        _match = []
+        nor_name = (str(name).strip()).casefold()
+        for topping in self._toppings:
+            nor_topping = topping.name.casefold()
+            if nor_name in nor_topping:
+                _match.append(topping)
+        return tuple(_match)

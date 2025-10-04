@@ -10,6 +10,12 @@ class InvalidQuantity(DomainError):
     pass
 
 
+class InvalidProductData(DomainError):
+    """Invalid product data."""
+
+    pass
+
+
 class ItemNotInMenu(DomainError):
     """Product not in menu."""
 
@@ -198,3 +204,9 @@ class RefundExceedsCapture(PaymentError):
 
     def __str__(self) -> str:
         return f"Refund exceeds captured amount: {self.amount}"
+
+
+class DuplicateSku(DomainError):
+    """Duplicate sku."""
+
+    pass
