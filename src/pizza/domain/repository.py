@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Protocol, Sequence
 
-from order import Order, OrderStatus
+from .order import Order, OrderStatus
 
 
 @dataclass(frozen=True, slots=True)

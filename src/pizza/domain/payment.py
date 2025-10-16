@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from decimal import Decimal
 from typing import Literal, Protocol, Sequence
 
-from order import Order
+from .order import Order
 
 Money = Decimal
 
