@@ -43,8 +43,8 @@ def menu_basic() -> Menu:
         ),
     ]
     toppings = [
-        Topping(sku="tp-exch", price=Decimal("2.00"), name="Extra Cheese"),
-        Topping(sku="tp-ppr", price=Decimal("1.50"), name="Extra Pepper"),
+        Topping(sku="tp-exch", unit_price=Decimal("2.00"), name="Extra Cheese"),
+        Topping(sku="tp-ppr", unit_price=Decimal("1.50"), name="Extra Pepper"),
     ]
     return Menu(pizzas=pizzas, toppings=toppings)
 
@@ -57,7 +57,7 @@ def test_size_multiplier_applied_to_price(menu_basic: Menu) -> None:
             PizzaSize.LARGE: Decimal("1.25"),
         }.items():
             expected = quantize_money(multiplier * pizza.default_price)
-            actual_price = pizza.price(size=size)
+            actual_price = pizza.unit_price(size=size)
             assert expected == actual_price, f"{pizza.name} wrong price for {size}"
 
 

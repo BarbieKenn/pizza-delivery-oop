@@ -35,12 +35,12 @@ class Topping:
     def __init__(
         self,
         name: str,
-        price: Money,
+        unit_price: Money,
         sku: str,
         requirements: list["IngredientRequirement"] | None = None,
     ):
         self.name = name
-        self.price = price
+        self.price = unit_price
         self.sku = sku
         self.requirements = requirements or []
 
@@ -48,6 +48,9 @@ class Topping:
             raise InvalidProductData(f"Topping {sku} must be >= 0.")
         if not all(req.amount > 0 for req in self.requirements):
             raise InvalidProductData(f"Topping {sku}: all requirements must be > 0")
+
+    def unit_price(self) -> Money:
+        return self.price
 
 
 class Pizza:
@@ -81,7 +84,7 @@ class Pizza:
         if not all(ing.amount > 0 for ing in recipe):
             raise InvalidProductData(f"Pizza {sku}: all ingredients must be > 0")
 
-    def price(self, size: PizzaSize) -> Money:
+    def unit_price(self, size: PizzaSize) -> Money:
         multiplier = MULTIPLIERS[size]
         return quantize_money(self.default_price * multiplier)
 

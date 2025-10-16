@@ -4,10 +4,12 @@ from decimal import Decimal
 from typing import TYPE_CHECKING, Iterable, Mapping, Protocol, Sequence
 
 from .delivery import Coordinates, Dispatcher
+from .errors import InvalidQuantity
 from .menu import Menu
 from .pricing import Money, OrderView, PricingStrategy
-from .products import Pizza
+from .products import Pizza, PizzaSize, Topping
 from .status import OrderStatus
+from .types import quantize_money
 
 if TYPE_CHECKING:
     from .inventory import Ingredient, Inventory, Oven
@@ -16,9 +18,23 @@ if TYPE_CHECKING:
 class OrderItem:
     """Single order line: one pizza and its quantity."""
 
-    def __init__(self, pizza: Pizza, qty: int):
+    def __init__(self, pizza: Pizza, qty: int, size: PizzaSize, toppings: tuple[Topping]):
         self.pizza = pizza
         self.qty = qty
+        self.size = size
+        self.toppings = toppings
+
+        if self.qty <= 0:
+            raise InvalidQuantity(f"Got quantity = {qty}, expected > 0.")
+
+    def unit_price(self) -> Money:
+        unit_price = self.pizza.unit_price(self.size) + sum(
+            topping.unit_price() for topping in self.toppings
+        )
+        return quantize_money(unit_price)
+
+    def line_price(self) -> Money:
+        return quantize_money(self.unit_price() * self.qty)
 
 
 class Order:
