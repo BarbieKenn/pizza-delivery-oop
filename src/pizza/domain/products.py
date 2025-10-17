@@ -32,6 +32,8 @@ class Topping:
     Price ≥ 0. Requirements amounts > 0 (if provided).
     """
 
+    __slots__ = ("name", "_unit_price", "sku", "requirements")
+
     def __init__(
         self,
         name: str,
@@ -40,17 +42,17 @@ class Topping:
         requirements: list["IngredientRequirement"] | None = None,
     ):
         self.name = name
-        self.price = unit_price
+        self._unit_price = unit_price
         self.sku = sku
         self.requirements = requirements or []
 
-        if self.price < 0:
+        if self._unit_price < 0:
             raise InvalidProductData(f"Topping {sku} must be >= 0.")
         if not all(req.amount > 0 for req in self.requirements):
             raise InvalidProductData(f"Topping {sku}: all requirements must be > 0")
 
     def unit_price(self) -> Money:
-        return self.price
+        return self._unit_price
 
 
 class Pizza:

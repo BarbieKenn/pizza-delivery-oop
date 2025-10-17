@@ -9,7 +9,7 @@ from .menu import Menu
 from .pricing import Money, OrderView, PricingStrategy
 from .products import Pizza, PizzaSize, Topping
 from .status import OrderStatus
-from .types import quantize_money
+from .types import OrderId, quantize_money
 
 if TYPE_CHECKING:
     from .inventory import Ingredient, Inventory, Oven
@@ -18,7 +18,7 @@ if TYPE_CHECKING:
 class OrderItem:
     """Single order line: one pizza and its quantity."""
 
-    def __init__(self, pizza: Pizza, qty: int, size: PizzaSize, toppings: tuple[Topping]):
+    def __init__(self, pizza: Pizza, qty: int, size: PizzaSize, toppings: tuple[Topping, ...]):
         self.pizza = pizza
         self.qty = qty
         self.size = size
@@ -29,7 +29,7 @@ class OrderItem:
 
     def unit_price(self) -> Money:
         unit_price = self.pizza.unit_price(self.size) + sum(
-            topping.unit_price() for topping in self.toppings
+            topping.unit_price for topping in self.toppings
         )
         return quantize_money(unit_price)
 
@@ -42,12 +42,29 @@ class Order:
 
     status: OrderStatus
 
-    def __init__(self, menu: Menu):
+    def __init__(
+        self,
+        menu: Menu,
+        id: OrderId,
+        customer,
+        delivery_address: Coordinates,
+        items: list[OrderItem],
+        status: OrderStatus,
+        pricing_strategy,
+    ):
         self.menu = menu
+        self._items = items
 
-    def add_item(self, pizza: Pizza, qty: int = 1) -> None:
+    def add_item(
+        self, pizza_sku: str, qty: int, size: PizzaSize, toppings_sku: Sequence[str], menu: Menu
+    ) -> None:
         """Add pizza with quantity to order."""
-        ...
+        toppings = []
+        for sku in toppings_sku:
+            toppings.append(menu.find_topping_sku(sku=sku))
+        pizza = menu.find_pizza_sku(sku=pizza_sku)
+        item = OrderItem(pizza, qty, size, tuple(toppings))
+        self._items.append(item)
 
     def remove_item(self, pizza: Pizza) -> None:
         """Remove pizza from order completely."""

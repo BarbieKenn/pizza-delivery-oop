@@ -22,6 +22,12 @@ class ItemNotInMenu(DomainError):
     pass
 
 
+class MenuItemNotFound(DomainError):
+    """Item not found."""
+
+    pass
+
+
 class InvalidTransition(DomainError):
     """Invalid status transition.
     NEW -> ACCEPTED -> BAKING -> BOXED -> DISPATCHED -> DELIVERED
