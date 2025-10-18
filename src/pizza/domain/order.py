@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 from decimal import Decimal
-from typing import TYPE_CHECKING, Iterable, Mapping, Protocol, Sequence
+from typing import TYPE_CHECKING, Mapping, Protocol, Sequence
 
 from .delivery import Coordinates, Dispatcher
-from .errors import InvalidQuantity
+from .errors import InvalidOrderItem, InvalidQuantity
 from .menu import Menu
 from .pricing import Money, OrderView, PricingStrategy
 from .products import Pizza, PizzaSize, Topping
@@ -45,42 +45,52 @@ class Order:
     def __init__(
         self,
         menu: Menu,
-        id: OrderId,
-        customer,
+        id: OrderId | None,
+        customer: str,
         delivery_address: Coordinates,
         items: list[OrderItem],
         status: OrderStatus,
-        pricing_strategy,
+        pricing_strategy: PricingStrategy,
     ):
+        self.id = id
         self.menu = menu
-        self._items = items
+        self.customer = customer
+        self.delivery_address = delivery_address
+        self._items = list(items)
+        self.status = status or OrderStatus.NEW
+        self.pricing_strategy = pricing_strategy
 
     def add_item(
-        self, pizza_sku: str, qty: int, size: PizzaSize, toppings_sku: Sequence[str], menu: Menu
+        self, pizza_sku: str, size: PizzaSize, qty: int, toppings_sku: Sequence[str]
     ) -> None:
         """Add pizza with quantity to order."""
         toppings = []
         for sku in toppings_sku:
-            toppings.append(menu.find_topping_sku(sku=sku))
-        pizza = menu.find_pizza_sku(sku=pizza_sku)
+            toppings.append(self.menu.find_topping_sku(sku=sku))
+        pizza = self.menu.find_pizza_sku(sku=pizza_sku)
         item = OrderItem(pizza, qty, size, tuple(toppings))
         self._items.append(item)
 
-    def remove_item(self, pizza: Pizza) -> None:
-        """Remove pizza from order completely."""
-        ...
+    def remove_item(self, index: int) -> None:
+        """Remove pizza from order."""
+        if index < 0 or index > len(self._items):
+            raise InvalidOrderItem(f"Invalid index: {index}")
+        del self._items[index]
 
     def clear(self) -> None:
         """Remove all items from order."""
-        ...
+        self._items.clear()
 
-    def items(self) -> Iterable[OrderItem]:
-        """Return iterable of order items."""
-        ...
+    def items_view(self) -> Sequence[OrderItem]:
+        """Return order items."""
+        return tuple(self._items)
 
-    def total(self) -> float:
+    def total(self) -> Money:
         """Return raw float total (temporary, not for final sums)."""
-        ...
+        total = 0
+        for position in self._items:
+            total += position.unit_price()
+        return quantize_money(Decimal(total))
 
     def can_accept(self) -> bool:
         """Return True if order can move NEW -> ACCEPTED."""
@@ -130,9 +140,6 @@ class Order:
         Raise AlreadyFinalized if DELIVERED or CANCELED.
         Raise InvalidTransition otherwise.
         """
-
-    _pricing_strategy: PricingStrategy
-    _status: "OrderStatus"
 
     def set_pricing_strategy(self, strategy: PricingStrategy) -> None:
         """

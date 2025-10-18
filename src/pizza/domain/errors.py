@@ -166,6 +166,12 @@ class DuplicateOrderId(DomainError):
         return f"Duplicate order id: {self.order_id}"
 
 
+class InvalidOrderItem(DomainError):
+    """Invalid order item."""
+
+    pass
+
+
 class PaymentError(DomainError):
     """Base payment error."""
 
