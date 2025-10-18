@@ -43,8 +43,8 @@ def menu_basic() -> Menu:
         ),
     ]
     toppings = [
-        Topping(sku="tp-exch", price=Decimal("2.00"), name="Extra Cheese"),
-        Topping(sku="tp-ppr", price=Decimal("1.50"), name="Extra Pepper"),
+        Topping(name="Extra Cheese", unit_price=Decimal("2.00"), sku="tp-exch", requirements=None),
+        Topping(name="Extra Pepper", unit_price=Decimal("1.50"), sku="tp-ppr", requirements=None),
     ]
     return Menu(pizzas=pizzas, toppings=toppings)
 
@@ -57,7 +57,7 @@ def test_size_multiplier_applied_to_price(menu_basic: Menu) -> None:
             PizzaSize.LARGE: Decimal("1.25"),
         }.items():
             expected = quantize_money(multiplier * pizza.default_price)
-            actual_price = pizza.price(size=size)
+            actual_price = pizza.unit_price(size=size)
             assert expected == actual_price, f"{pizza.name} wrong price for {size}"
 
 
@@ -73,7 +73,7 @@ def test_size_multiplier_applied_to_price(menu_basic: Menu) -> None:
     ],
 )
 def test_menu_lookup_and_readonly(menu_basic: Menu, name: str, expected_name: list[str]) -> None:
-    result = menu_basic.find_pizza(name=name)
+    result = menu_basic.find_pizza_name(name=name)
     for pizza in result:
         result_names = [pizza.name for pizza in result]
         assert result_names == expected_name, f"Expected {expected_name}, but found {pizza.name}"

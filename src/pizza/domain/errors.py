@@ -22,6 +22,12 @@ class ItemNotInMenu(DomainError):
     pass
 
 
+class MenuItemNotFound(DomainError):
+    """Item not found."""
+
+    pass
+
+
 class InvalidTransition(DomainError):
     """Invalid status transition.
     NEW -> ACCEPTED -> BAKING -> BOXED -> DISPATCHED -> DELIVERED
@@ -158,6 +164,12 @@ class DuplicateOrderId(DomainError):
 
     def __str__(self) -> str:
         return f"Duplicate order id: {self.order_id}"
+
+
+class InvalidOrderItem(DomainError):
+    """Invalid order item."""
+
+    pass
 
 
 class PaymentError(DomainError):
