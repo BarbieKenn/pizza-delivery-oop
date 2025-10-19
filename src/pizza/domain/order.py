@@ -29,11 +29,11 @@ class OrderItem:
 
     def unit_price(self) -> Money:
         unit_price = self.pizza.unit_price(self.size) + sum(
-            topping.unit_price for topping in self.toppings
+            topping.unit_price() for topping in self.toppings
         )
         return quantize_money(unit_price)
 
-    def line_price(self) -> Money:
+    def line_total(self) -> Money:
         return quantize_money(self.unit_price() * self.qty)
 
 
@@ -49,8 +49,8 @@ class Order:
         customer: str,
         delivery_address: Coordinates,
         items: list[OrderItem],
-        status: OrderStatus,
-        pricing_strategy: PricingStrategy,
+        status: OrderStatus | None,
+        pricing_strategy: PricingStrategy | None,
     ):
         self.id = id
         self.menu = menu
@@ -64,6 +64,8 @@ class Order:
         self, pizza_sku: str, size: PizzaSize, qty: int, toppings_sku: Sequence[str]
     ) -> None:
         """Add pizza with quantity to order."""
+        if qty <= 0:
+            raise InvalidQuantity(f"got qty = {qty}. Expected qty > 0")
         toppings = []
         for sku in toppings_sku:
             toppings.append(self.menu.find_topping_sku(sku=sku))
@@ -85,12 +87,12 @@ class Order:
         """Return order items."""
         return tuple(self._items)
 
-    def total(self) -> Money:
+    def subtotal(self) -> Money:
         """Return raw float total (temporary, not for final sums)."""
-        total = 0
+        total = Money(0)
         for position in self._items:
-            total += position.unit_price()
-        return quantize_money(Decimal(total))
+            total += position.line_total()
+        return quantize_money(total)
 
     def can_accept(self) -> bool:
         """Return True if order can move NEW -> ACCEPTED."""
@@ -149,12 +151,6 @@ class Order:
         Otherwise, InvalidPricingOperation.
         """
 
-        raise NotImplementedError
-
-    def subtotal(self) -> Money:
-        """
-        Sum of positions without sales, taxes and delivery.
-        """
         raise NotImplementedError
 
     def final_total(self) -> Money:
