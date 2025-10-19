@@ -12,7 +12,7 @@ class Menu:
     def __init__(self, pizzas: Sequence[Pizza], toppings: Sequence[Topping]) -> None:
         seen_pizzas = set()
         for pizza in pizzas:
-            sku = pizza.sku.strip().lower
+            sku = pizza.sku.strip().lower()
             if sku in seen_pizzas:
                 raise DuplicateSku(f"Similar pizza sku - {sku}")
             else:
